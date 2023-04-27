@@ -1,11 +1,17 @@
 # my_mordl is a game where you guess a word and the code give you a feedback whethert you guessed it correctly or you misplace some of the letteracter
+import random
+import pathlib
 
 
 def menu():
     print("Hello World")
 
 
-word = "IBRAHIM"
+word_list = pathlib.Path("word_list.txt")
+word = random.choice(
+    [word.upper() for word in word_list.read_text(encoding="utf-8").strip().split("\n")]
+)
+print(word)
 for guess_count in range(1, 7):
     user_guess = input(f"Guess No.{guess_count} : ").upper()
 
@@ -24,3 +30,5 @@ for guess_count in range(1, 7):
     print("Correct Letters :", ", ".join(sorted(correct_letter)))
     print("Misplaced letter : ", ",".join(sorted(misplaced_letter)))
     print("Wrong Letter : ", ", ".join(sorted(wrong_letter)))
+else:
+    print(f"{word} is the correct word")
