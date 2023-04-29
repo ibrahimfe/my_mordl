@@ -1,14 +1,15 @@
 import random
+import contextlib
 from string import ascii_letters, ascii_uppercase
 
 from rich.console import Console
 from rich.theme import Theme
 
-console = Console(width=40, theme=Theme({"warning": "red on yellow"}))
+console = Console(width=40, theme=Theme({"warning": "red on yellow"}))  # type: ignore
 
 # constant
 NUM_LETTERS = 5
-NUM_GUESS = 9
+NUM_GUESS = 6
 WORD_LIST = open("word_list.txt", "r", encoding="utf-8")
 
 
@@ -33,21 +34,26 @@ def get_random_word():
 
 def guess_word(previous_guesses):
     guess = console.input("\nGuess Word : ").upper()
+
     if guess in previous_guesses:
         console.print(f"You Already Guessed {guess}.", style="warning")
         return guess_word(previous_guesses)
+
     if len(guess) != NUM_LETTERS:
         console.print("Your Guess must be 5 letters.", style="warning")
         return guess_word(previous_guesses)
+
     if any((invalid := letter) not in ascii_letters for letter in guess):
         console.print(
             f"Invalid Letter {invalid}, Please use standar Alphabet!!", style="warning"
         )
         return guess_word(previous_guesses)
+
     return guess
 
 
 def show_guesses(guesses, word):
+    letter_status = {letter: letter for letter in ascii_uppercase}
     for guess in guesses:
         styled_guess = []
         for letter, correct in zip(guess, word):
@@ -60,8 +66,11 @@ def show_guesses(guesses, word):
             else:
                 style = "dim"
             styled_guess.append(f"[{style}]{letter}[/]")
+            if letter != "_":
+                letter_status[letter] = f"[{style}]{letter}[/]"
 
         console.print("".join(styled_guess), justify="center")
+    console.print("\n" + "".join(letter_status.values()), justify="center")
 
 
 def game_over(guesses, word, guessed_correctly):
@@ -76,19 +85,23 @@ def game_over(guesses, word, guessed_correctly):
 
 
 def main():
+    # Pre-Process
     word = get_random_word()
     guess = ["_" * NUM_LETTERS] * NUM_GUESS
 
-    for idx in range(NUM_GUESS):
-        refresh_page(headline=f"Guess No{idx + 1}")
-        print(word)
-        show_guesses(guess, word)
+    # Prcess Main Loop
+    with contextlib.suppress(KeyboardInterrupt):
+        for idx in range(NUM_GUESS):
+            refresh_page(headline=f"Guess No{idx + 1}")
+            print(word)
+            show_guesses(guess, word)
 
-        guess[idx] = guess_word(previous_guesses=guess[:idx])
+            guess[idx] = guess_word(previous_guesses=guess[:idx])
 
-        if guess[idx] == word:
-            break
+            if guess[idx] == word:
+                break
 
+    # Post Process
     game_over(guess, word, guessed_correctly=guess[idx] == word)
 
 
