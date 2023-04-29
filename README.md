@@ -6,13 +6,13 @@ my_mordl is a Python project that provides a clone of the popular word game by t
 
 ## Installation
 
-1. Clone the repository from Github:
+1.  Clone the repository from Github:
 
-    $ git clone https://github.com/ibrahimfe/my_mordl.git
+        $ git clone https://github.com/ibrahimfe/my_mordl.git
 
-2. Install the required dependencies:
+2.  Install the required dependencies:
 
-    $ pip install rich random contextlib
+        $ pip install rich random contextlib
 
 ## Usage
 
