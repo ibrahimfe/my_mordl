@@ -1,11 +1,15 @@
 import random
-import pathlib
-from string import ascii_letters
+from string import ascii_letters, ascii_uppercase
 
 from rich.console import Console
 from rich.theme import Theme
 
 console = Console(width=40, theme=Theme({"warning": "red on yellow"}))
+
+# constant
+NUM_LETTERS = 5
+NUM_GUESS = 9
+WORD_LIST = open("word_list.txt", "r", encoding="utf-8")
 
 
 def refresh_page(headline):
@@ -14,13 +18,33 @@ def refresh_page(headline):
 
 
 def get_random_word():
-    with open("word_list.txt", "r", encoding="utf-8") as f:
-        words = [
+    with WORD_LIST as f:
+        if words := [
             word.upper()
             for word in f.read().splitlines()
-            if len(word) == 5 and all(letter in ascii_letters for letter in word)
-        ]
-    return random.choices(words)[0]
+            if len(word) == NUM_LETTERS
+            and all(letter in ascii_letters for letter in word)
+        ]:
+            return random.choices(words)[0]
+        else:
+            console.print("No Words of lengths 5 in the word list", style="warning")
+            raise SystemExit()
+
+
+def guess_word(previous_guesses):
+    guess = console.input("\nGuess Word : ").upper()
+    if guess in previous_guesses:
+        console.print(f"You Already Guessed {guess}.", style="warning")
+        return guess_word(previous_guesses)
+    if len(guess) != NUM_LETTERS:
+        console.print("Your Guess must be 5 letters.", style="warning")
+        return guess_word(previous_guesses)
+    if any((invalid := letter) not in ascii_letters for letter in guess):
+        console.print(
+            f"Invalid Letter {invalid}, Please use standar Alphabet!!", style="warning"
+        )
+        return guess_word(previous_guesses)
+    return guess
 
 
 def show_guesses(guesses, word):
@@ -40,12 +64,12 @@ def show_guesses(guesses, word):
         console.print("".join(styled_guess), justify="center")
 
 
-def game_over(guesses, word):
+def game_over(guesses, word, guessed_correctly):
     refresh_page(headline="Game Over")
 
     show_guesses(guesses, word)
 
-    if guesses[-1] == word:
+    if guessed_correctly:
         console.print(f"\n[bold white on green]Correct, the Word is {word}[/]")
     else:
         console.print(f"[bold white on red]Sorry, The Word was {word}[/]")
@@ -53,18 +77,19 @@ def game_over(guesses, word):
 
 def main():
     word = get_random_word()
-    guess = ["_" * 5] * 6
+    guess = ["_" * NUM_LETTERS] * NUM_GUESS
 
-    for idx in range(6):
+    for idx in range(NUM_GUESS):
         refresh_page(headline=f"Guess No{idx + 1}")
+        print(word)
         show_guesses(guess, word)
 
-        guess[idx] = input(f"\nGuess no.{idx + 1} : ").upper()
+        guess[idx] = guess_word(previous_guesses=guess[:idx])
 
         if guess[idx] == word:
             break
 
-    game_over(guess, word)
+    game_over(guess, word, guessed_correctly=guess[idx] == word)
 
 
 if __name__ == "__main__":
