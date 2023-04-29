@@ -8,17 +8,17 @@ my_mordl is a Python project that provides a clone of the popular word game by t
 
 1. Clone the repository from Github:
 
-`$ git clone https://github.com/ibrahimfe/my_mordl.git`
+    `$ git clone https://github.com/ibrahimfe/my_mordl.git`
 
 2. Install the required dependencies:
 
-`$ pip install rich random contextlib`
+    `$ pip install rich random contextlib`
 
 ## Usage
 
 To play my_mordl, navigate to the root directory of the project in your terminal and run the following command:
 
-`$ python my_mordl.py`
+    `$ python my_mordl.py`
 
 The game will start, and you will be presented with a five-letter word scrambled in a random order. You must guess the original word based on the available letters. You have a limited number of attempts to guess the word, and each incorrect guess will reduce the number of attempts remaining.
 
